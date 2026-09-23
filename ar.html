@@ -15,7 +15,30 @@ html,body{
   margin:0;width:100%;height:100%;overflow:hidden;background:#000;
   font-family:Georgia,"Times New Roman",serif
 }
+
+/* La cámara de MindAR existe aunque el target ya se detecte.
+   Estas reglas hacen visible el <video> que MindAR inserta y mantienen
+   el canvas A-Frame transparente encima. */
+video {
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  z-index:0 !important;
+}
+a-scene {
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  z-index:1 !important;
+  background:transparent !important;
+}
+.a-canvas {
+  background:transparent !important;
+  background-color:transparent !important;
+}
 #hud{position:fixed;inset:0;z-index:9999;pointer-events:none}
+
 #topbar{
   position:absolute;left:12px;right:12px;top:12px;
   background:rgba(10,7,5,.86);border:1px solid #8a5b2c;
@@ -72,7 +95,7 @@ button{
 <a-scene id="scene"
   mindar-image="imageTargetSrc: targets/targets.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no;"
   color-space="sRGB"
-  renderer="colorManagement: true; physicallyCorrectLights: true; antialias: false; precision: mediump;"
+  renderer="colorManagement: true; physicallyCorrectLights: true; antialias: false; alpha: true; precision: mediump;"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
   embedded>
@@ -225,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
   technical.textContent = "";
   log("A-Frame: " + (window.AFRAME ? AFRAME.version : "NO CARGÓ"));
   log("MindAR component: " + (!!(window.AFRAME && AFRAME.components && AFRAME.components["mindar-image"])));
+  log("Renderer alpha solicitado: true");
 
   window.addEventListener("error", e => log("ERROR JS: " + e.message));
   window.addEventListener("unhandledrejection", e => {
