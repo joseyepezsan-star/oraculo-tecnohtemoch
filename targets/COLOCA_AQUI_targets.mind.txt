@@ -1,0 +1,1 @@
+Genera targets.mind con assets/target-temporal.jpg usando el compilador de MindAR y colócalo en esta carpeta.

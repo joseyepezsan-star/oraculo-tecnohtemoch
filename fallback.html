@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Consulta sin AR — Tecnohtemoch</title>
+<link rel="stylesheet" href="styles.css">
+<script src="predicciones.js"></script>
+</head>
+<body>
+<main class="shell">
+  <section class="panel">
+    <div class="rune">☾ ◉ ✦ ◉ ☽</div>
+    <h1>CONSULTA AL ORÁCULO</h1>
+    <p class="subtitle">Modo para navegadores poco cooperativos</p>
+
+    <div id="resultado" class="prediccion" hidden>
+      <h2 id="titulo"></h2>
+      <p id="serio"></p>
+      <p id="giro" class="giro"></p>
+      <p id="consejo" class="consejo"></p>
+    </div>
+
+    <button id="consultar" class="button">Revelar mi augurio</button>
+    <a class="button secondary" href="ar.html">Volver a intentar con cámara</a>
+    <a class="button secondary" href="index.html">Inicio</a>
+  </section>
+</main>
+<script>
+const r=document.querySelector('#resultado');
+document.querySelector('#consultar').addEventListener('click',()=>{
+  const p=window.elegirPrediccion();
+  document.querySelector('#titulo').textContent=p.titulo;
+  document.querySelector('#serio').textContent=p.serio;
+  document.querySelector('#giro').textContent=p.gracioso;
+  document.querySelector('#consejo').textContent=p.consejo;
+  r.hidden=false;
+  r.animate([{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'scale(1)'}],
+            {duration:420,easing:'ease-out'});
+});
+</script>
+</body>
+</html>

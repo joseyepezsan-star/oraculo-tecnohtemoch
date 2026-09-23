@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Consulta AR — Tecnohtemoch</title>
+
+<!-- Configuración estable que ya funcionó: A-Frame 1.5.0 + MindAR 1.2.5 -->
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<script src="predicciones.js"></script>
+
+<style>
+html,body{
+  margin:0;width:100%;height:100%;overflow:hidden;background:#000;
+  font-family:Georgia,"Times New Roman",serif
+}
+#hud{position:fixed;inset:0;z-index:9999;pointer-events:none}
+#topbar{
+  position:absolute;left:12px;right:12px;top:12px;
+  background:rgba(10,7,5,.86);border:1px solid #8a5b2c;
+  color:#f0dfbf;padding:10px 12px;text-align:center
+}
+#status{font-weight:700}
+#hint{font-size:.82rem;color:#c8a984;margin-top:3px}
+
+#startPanel{
+  pointer-events:auto;position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;background:rgba(0,0,0,.78);padding:24px
+}
+#startCard{
+  max-width:560px;background:#100b08;border:1px solid #8a5b2c;
+  color:#f0dfbf;padding:24px;text-align:center
+}
+button{
+  border:1px solid #bf8843;background:#2b1710;color:#f5e6c9;
+  padding:14px 18px;font:700 16px Georgia,serif;cursor:pointer;
+  width:100%;margin-top:12px
+}
+#technical{
+  font:12px/1.45 Consolas,monospace;color:#d1b991;background:#090705;
+  padding:10px;margin-top:14px;text-align:left;white-space:pre-wrap
+}
+#fallback{
+  pointer-events:auto;position:absolute;left:50%;bottom:18px;
+  transform:translateX(-50%);text-decoration:none;color:#f3dfbd;
+  background:rgba(25,13,9,.9);border:1px solid #9d6b34;
+  padding:10px 14px;white-space:nowrap
+}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div id="topbar">
+    <div id="status">Preparando el Oráculo…</div>
+    <div id="hint">Espera a que MindAR esté listo.</div>
+  </div>
+
+  <div id="startPanel">
+    <div id="startCard">
+      <h2>Consulta con cámara</h2>
+      <p>Activa la cámara y apunta al mural completo de Tecnohtemoch.</p>
+      <button id="startBtn" disabled>ACTIVAR CÁMARA</button>
+      <div id="technical">Esperando carga…</div>
+    </div>
+  </div>
+
+  <a id="fallback" href="fallback.html">El oráculo no coopera → usar modo simple</a>
+</div>
+
+<a-scene id="scene"
+  mindar-image="imageTargetSrc: targets/targets.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no;"
+  color-space="sRGB"
+  renderer="colorManagement: true; physicallyCorrectLights: true; antialias: false; precision: mediump;"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+  embedded>
+
+  <a-assets>
+    <canvas id="predictionCanvas" width="1024" height="1250"></canvas>
+  </a-assets>
+
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+  <a-entity id="target" mindar-image-target="targetIndex: 0">
+
+    <!--
+      OJOS:
+      Posiciones aproximadas para el marcador actual.
+      Si quieres moverlos:
+      - x negativo = izquierda
+      - x positivo = derecha
+      - y positivo = arriba
+      - y negativo = abajo
+    -->
+    <a-circle id="eyeGlowL"
+      position="-0.105 0.155 0.075"
+      radius="0.035"
+      material="shader: flat; color: #ffb347; transparent: true; opacity: 0"
+      visible="false">
+    </a-circle>
+
+    <a-circle id="eyeCoreL"
+      position="-0.105 0.155 0.080"
+      radius="0.012"
+      material="shader: flat; color: #fff4c2; transparent: true; opacity: 0"
+      visible="false">
+    </a-circle>
+
+    <a-circle id="eyeGlowR"
+      position="0.105 0.155 0.075"
+      radius="0.035"
+      material="shader: flat; color: #ffb347; transparent: true; opacity: 0"
+      visible="false">
+    </a-circle>
+
+    <a-circle id="eyeCoreR"
+      position="0.105 0.155 0.080"
+      radius="0.012"
+      material="shader: flat; color: #fff4c2; transparent: true; opacity: 0"
+      visible="false">
+    </a-circle>
+
+    <!--
+      RESPLANDOR DE LA CALAVERA:
+      Halo circular + aro. El centro está colocado sobre la frente del cráneo.
+    -->
+    <a-circle id="skullGlow"
+      position="0 -0.325 0.060"
+      radius="0.19"
+      material="shader: flat; color: #d8a54a; transparent: true; opacity: 0"
+      visible="false">
+    </a-circle>
+
+    <a-ring id="skullRing"
+      position="0 -0.325 0.070"
+      radius-inner="0.145"
+      radius-outer="0.158"
+      material="shader: flat; color: #ffe0a0; transparent: true; opacity: 0"
+      visible="false">
+    </a-ring>
+
+    <!-- Carta con la predicción -->
+    <a-plane id="card"
+      position="0 -0.31 0.090"
+      width="0.76"
+      height="0.93"
+      material="src: #predictionCanvas; transparent: true; opacity: 0.97"
+      visible="false">
+    </a-plane>
+
+  </a-entity>
+</a-scene>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const scene = document.querySelector("#scene");
+  const target = document.querySelector("#target");
+  const card = document.querySelector("#card");
+  const canvas = document.querySelector("#predictionCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const eyeGlowL = document.querySelector("#eyeGlowL");
+  const eyeCoreL = document.querySelector("#eyeCoreL");
+  const eyeGlowR = document.querySelector("#eyeGlowR");
+  const eyeCoreR = document.querySelector("#eyeCoreR");
+  const skullGlow = document.querySelector("#skullGlow");
+  const skullRing = document.querySelector("#skullRing");
+
+  const status = document.querySelector("#status");
+  const hint = document.querySelector("#hint");
+  const startPanel = document.querySelector("#startPanel");
+  const startBtn = document.querySelector("#startBtn");
+  const technical = document.querySelector("#technical");
+
+  let arSystem = null;
+  let timers = [];
+
+  const log = (m) => {
+    technical.textContent += "\n" + m;
+    console.log("[ORACULO]", m);
+  };
+
+  const later = (fn, ms) => {
+    const t = setTimeout(fn, ms);
+    timers.push(t);
+    return t;
+  };
+
+  const clearSequence = () => {
+    timers.forEach(clearTimeout);
+    timers = [];
+  };
+
+  const stopAnimations = (el) => {
+    ["animation__pulse1","animation__pulse2","animation__grow","animation__fade",
+     "animation__ring","animation__card"].forEach(a => el.removeAttribute(a));
+  };
+
+  function resetEffects() {
+    clearSequence();
+
+    [eyeGlowL, eyeCoreL, eyeGlowR, eyeCoreR, skullGlow, skullRing, card].forEach(el => {
+      stopAnimations(el);
+      el.setAttribute("visible", "false");
+    });
+
+    eyeGlowL.setAttribute("material","opacity",0);
+    eyeCoreL.setAttribute("material","opacity",0);
+    eyeGlowR.setAttribute("material","opacity",0);
+    eyeCoreR.setAttribute("material","opacity",0);
+    skullGlow.setAttribute("material","opacity",0);
+    skullRing.setAttribute("material","opacity",0);
+
+    eyeGlowL.setAttribute("scale","1 1 1");
+    eyeGlowR.setAttribute("scale","1 1 1");
+    eyeCoreL.setAttribute("scale","1 1 1");
+    eyeCoreR.setAttribute("scale","1 1 1");
+    skullGlow.setAttribute("scale","1 1 1");
+    skullRing.setAttribute("scale","1 1 1");
+    card.setAttribute("scale","0.72 0.72 0.72");
+  }
+
+  technical.textContent = "";
+  log("A-Frame: " + (window.AFRAME ? AFRAME.version : "NO CARGÓ"));
+  log("MindAR component: " + (!!(window.AFRAME && AFRAME.components && AFRAME.components["mindar-image"])));
+
+  window.addEventListener("error", e => log("ERROR JS: " + e.message));
+  window.addEventListener("unhandledrejection", e => {
+    const reason = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+    log("PROMESA RECHAZADA: " + reason);
+  });
+
+  scene.addEventListener("loaded", () => {
+    arSystem = scene.systems["mindar-image-system"];
+    log("Escena cargada.");
+    log("MindAR system: " + (!!arSystem));
+
+    if (arSystem) {
+      status.textContent = "Oráculo listo";
+      hint.textContent = "Pulsa ACTIVAR CÁMARA.";
+      startBtn.disabled = false;
+    } else {
+      status.textContent = "MindAR no se registró";
+      hint.textContent = "Revisa el diagnóstico.";
+    }
+  });
+
+  scene.addEventListener("arReady", () => {
+    log("EVENTO: arReady");
+    status.textContent = "Busca a Tecnohtemoch";
+    hint.textContent = "Apunta la cámara hacia la pintura completa.";
+    startPanel.style.display = "none";
+  });
+
+  scene.addEventListener("arError", ev => {
+    log("EVENTO: arError");
+    status.textContent = "No se pudo iniciar la cámara";
+    hint.textContent = "Revisa permisos o diagnóstico.";
+    startBtn.disabled = false;
+  });
+
+  async function startAR() {
+    startBtn.disabled = true;
+    status.textContent = "Solicitando cámara…";
+    hint.textContent = "Acepta el permiso del navegador.";
+    log("Inicio solicitado.");
+
+    try {
+      arSystem = scene.systems["mindar-image-system"];
+      if (!arSystem) throw new Error("MindAR no está disponible.");
+      await arSystem.start();
+      log("start() completado.");
+    } catch (err) {
+      log("FALLO start(): " + (err && err.message ? err.message : String(err)));
+      status.textContent = "No se pudo iniciar";
+      hint.textContent = "Revisa el diagnóstico.";
+      startBtn.disabled = false;
+    }
+  }
+
+  startBtn.addEventListener("click", startAR);
+
+  function wrapText(text,x,y,maxWidth,lineHeight,maxLines){
+    const words=text.split(/\s+/); let line="",lines=[];
+    for(let i=0;i<words.length;i++){
+      const test=line?line+" "+words[i]:words[i];
+      if(ctx.measureText(test).width>maxWidth && line){
+        lines.push(line);line=words[i];
+      } else line=test;
+    }
+    if(line) lines.push(line);
+
+    if(maxLines && lines.length>maxLines){
+      lines=lines.slice(0,maxLines);
+      lines[maxLines-1]=lines[maxLines-1].replace(/[.,;:]?$/,"")+"…";
+    }
+
+    lines.forEach(l=>{
+      ctx.fillText(l,x,y);
+      y+=lineHeight;
+    });
+    return y;
+  }
+
+  function drawPrediction(p){
+    const w=canvas.width,h=canvas.height;
+
+    const g=ctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,"#e5d2a8");
+    g.addColorStop(.5,"#d3b77f");
+    g.addColorStop(1,"#b9925d");
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,w,h);
+
+    ctx.strokeStyle="#4c2b18";
+    ctx.lineWidth=16;
+    ctx.strokeRect(24,24,w-48,h-48);
+
+    ctx.strokeStyle="#8f6230";
+    ctx.lineWidth=4;
+    ctx.strokeRect(45,45,w-90,h-90);
+
+    ctx.textAlign="center";
+    ctx.fillStyle="#4b2916";
+    ctx.font="42px Georgia";
+    ctx.fillText("☾   ◉   ✦   ◉   ☽",w/2,92);
+
+    ctx.fillStyle="#26160e";
+    ctx.font="bold 52px Georgia";
+    wrapText(p.titulo,w/2,175,850,62,2);
+
+    ctx.strokeStyle="rgba(50,28,14,.45)";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(130,285);
+    ctx.lineTo(w-130,285);
+    ctx.stroke();
+
+    ctx.font="34px Georgia";
+    let y=350;
+    y=wrapText(p.serio,w/2,y,820,48,5)+24;
+
+    ctx.font="italic 31px Georgia";
+    ctx.fillStyle="#5b321d";
+    y=wrapText(p.gracioso,w/2,y,810,44,5)+32;
+
+    ctx.strokeStyle="rgba(50,28,14,.45)";
+    ctx.beginPath();
+    ctx.moveTo(160,y);
+    ctx.lineTo(w-160,y);
+    ctx.stroke();
+    y+=58;
+
+    ctx.font="bold 34px Georgia";
+    ctx.fillStyle="#23140c";
+    wrapText(p.consejo,w/2,y,810,48,6);
+
+    ctx.font="28px Georgia";
+    ctx.fillStyle="#73401f";
+    ctx.fillText("— Tecnohtemoch Ruseveltzin Neztacotoyotl —",w/2,1168);
+
+    const mesh=card.getObject3D("mesh");
+    if(mesh && mesh.material && mesh.material.map) {
+      mesh.material.map.needsUpdate=true;
+    }
+  }
+
+  function animateEyes() {
+    [eyeGlowL, eyeCoreL, eyeGlowR, eyeCoreR].forEach(el => el.setAttribute("visible","true"));
+
+    eyeGlowL.setAttribute("animation__pulse1",
+      "property: material.opacity; from: 0; to: 0.85; dur: 250; easing: easeOutQuad");
+    eyeGlowR.setAttribute("animation__pulse1",
+      "property: material.opacity; from: 0; to: 0.85; dur: 250; easing: easeOutQuad");
+    eyeCoreL.setAttribute("animation__pulse1",
+      "property: material.opacity; from: 0; to: 1; dur: 220; easing: easeOutQuad");
+    eyeCoreR.setAttribute("animation__pulse1",
+      "property: material.opacity; from: 0; to: 1; dur: 220; easing: easeOutQuad");
+
+    eyeGlowL.setAttribute("animation__grow",
+      "property: scale; from: 0.6 0.6 0.6; to: 1.35 1.35 1.35; dur: 420; dir: alternate; loop: 2; easing: easeInOutSine");
+    eyeGlowR.setAttribute("animation__grow",
+      "property: scale; from: 0.6 0.6 0.6; to: 1.35 1.35 1.35; dur: 420; dir: alternate; loop: 2; easing: easeInOutSine");
+
+    later(() => {
+      eyeGlowL.setAttribute("animation__fade",
+        "property: material.opacity; to: 0.18; dur: 450; easing: easeOutSine");
+      eyeGlowR.setAttribute("animation__fade",
+        "property: material.opacity; to: 0.18; dur: 450; easing: easeOutSine");
+      eyeCoreL.setAttribute("animation__fade",
+        "property: material.opacity; to: 0.45; dur: 450; easing: easeOutSine");
+      eyeCoreR.setAttribute("animation__fade",
+        "property: material.opacity; to: 0.45; dur: 450; easing: easeOutSine");
+    }, 900);
+  }
+
+  function animateSkull() {
+    skullGlow.setAttribute("visible","true");
+    skullRing.setAttribute("visible","true");
+
+    skullGlow.setAttribute("animation__pulse1",
+      "property: material.opacity; from: 0; to: 0.34; dur: 420; easing: easeOutQuad");
+    skullGlow.setAttribute("animation__grow",
+      "property: scale; from: 0.45 0.45 0.45; to: 1.15 1.15 1.15; dur: 700; easing: easeOutCubic");
+
+    skullRing.setAttribute("animation__ring",
+      "property: material.opacity; from: 0; to: 0.95; dur: 320; easing: easeOutQuad");
+    skullRing.setAttribute("animation__grow",
+      "property: scale; from: 0.55 0.55 0.55; to: 1.28 1.28 1.28; dur: 760; easing: easeOutCubic");
+
+    later(() => {
+      skullGlow.setAttribute("animation__fade",
+        "property: material.opacity; to: 0.12; dur: 550; easing: easeOutSine");
+      skullRing.setAttribute("animation__fade",
+        "property: material.opacity; to: 0.22; dur: 550; easing: easeOutSine");
+    }, 760);
+  }
+
+  function revealCard() {
+    drawPrediction(window.elegirPrediccion());
+
+    card.setAttribute("visible","true");
+    card.setAttribute("scale","0.72 0.72 0.72");
+    card.setAttribute("animation__card",
+      "property: scale; from: 0.72 0.72 0.72; to: 1 1 1; dur: 650; easing: easeOutBack");
+
+    status.textContent="El oráculo ha hablado";
+    hint.textContent="Mantén la cámara apuntando al mural.";
+  }
+
+  target.addEventListener("targetFound",()=>{
+    log("TARGET FOUND");
+    resetEffects();
+
+    status.textContent="Tecnohtemoch te ha visto…";
+    hint.textContent="No apartes la cámara.";
+
+    // 0.0 s — ojos
+    animateEyes();
+
+    // 1.2 s — calavera
+    later(() => {
+      status.textContent="El cráneo despierta…";
+      hint.textContent="Consultando las antiguas runas.";
+      animateSkull();
+    }, 1200);
+
+    // 2.5 s — predicción
+    later(() => {
+      revealCard();
+    }, 2500);
+  });
+
+  target.addEventListener("targetLost",()=>{
+    log("TARGET LOST");
+    resetEffects();
+    status.textContent="Tecnohtemoch desapareció";
+    hint.textContent="Vuelve a apuntar a la pintura completa.";
+  });
+
+  resetEffects();
+});
+</script>
+</body>
+</html>
