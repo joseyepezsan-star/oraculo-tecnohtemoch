@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Diagnóstico MindAR V4</title>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<style>
+body{background:#111;color:#eee;font-family:system-ui;padding:24px}
+pre{background:#000;border:1px solid #444;padding:16px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>Diagnóstico MindAR V4</h1>
+<pre id="o">Probando…</pre>
+<script>
+const lines=[];
+lines.push("A-Frame: "+(window.AFRAME?AFRAME.version:"NO"));
+lines.push("mindar-image component: "+!!(window.AFRAME&&AFRAME.components["mindar-image"]));
+lines.push("mindar-image-target component: "+!!(window.AFRAME&&AFRAME.components["mindar-image-target"]));
+lines.push("mindar-image system registrado globalmente: "+!!(window.AFRAME&&AFRAME.systems&&AFRAME.systems["mindar-image-system"]));
+document.querySelector("#o").textContent=lines.join("\n");
+</script>
+</body>
+</html>

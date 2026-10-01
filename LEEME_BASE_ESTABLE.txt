@@ -1,0 +1,32 @@
+ORÁCULO EMOCIONAL — BASE ESTABLE
+================================
+
+Esta carpeta conserva la última versión recibida del proyecto, pero usa como ar.html
+la versión V6 estable que mostró la predicción como HTML superpuesto en lugar de
+renderizar la carta y efectos dentro de WebGL.
+
+SE CONSERVA SIN CAMBIOS:
+- index.html
+- fallback.html
+- predicciones.js (18 augurios actuales)
+- styles.css
+- diagnostico.html
+- mindar_check.html
+- webgl.html
+- servidor local
+- assets/
+- targets/targets.mind de la última versión recibida (945607 bytes)
+
+RESPALDO:
+- ar_animado_respaldo.html = ar.html que venía en la última versión recibida,
+  con animación/efectos WebGL.
+
+SIGUIENTE PRUEBA:
+1. Probar index.html y ar.html localmente o en GitHub Pages.
+2. Confirmar que la cámara abre.
+3. Confirmar que reconoce el mural final.
+4. Confirmar que aparece la carta HTML.
+5. Probar al menos en dos teléfonos.
+
+No se han añadido todavía las 100 predicciones ni las páginas de créditos o
+inteligencia emocional.

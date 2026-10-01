@@ -1,0 +1,26 @@
+CAMBIO IMPORTANTE EN V2
+=======================
+El ar.html original usaba A-Frame 1.2.0. La documentación actual de MindAR 1.2.5
+usa A-Frame 1.5/1.6. Esta versión fue corregida a A-Frame 1.6.0.
+
+Además:
+- La cámara ya NO inicia automáticamente.
+- Debes pulsar ACTIVAR CÁMARA.
+- Si hay un error, aparece un diagnóstico visible.
+- diagnostico.html permite probar cámara, targets.mind y acceso a las librerías por separado.
+
+PRUEBA RECOMENDADA
+------------------
+1. Sustituye tu ar.html por el de esta carpeta.
+2. Copia diagnostico.html a la misma carpeta.
+3. Deja targets/targets.mind donde ya lo tienes.
+4. Inicia INICIAR_SERVIDOR.bat.
+5. Abre primero:
+   http://localhost:8000/diagnostico.html
+6. Ejecuta las tres pruebas:
+   - marcador
+   - webcam
+   - CDN
+7. Si todo sale OK, abre:
+   http://localhost:8000/ar.html
+   y pulsa ACTIVAR CÁMARA.

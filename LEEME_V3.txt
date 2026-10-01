@@ -1,0 +1,18 @@
+V3 - COMPATIBILIDAD WEBGL
+
+El error observado fue:
+Error creating WebGL context
+
+Por eso esta versión cambia A-Frame 1.6.0 por A-Frame 1.5.0,
+que usa una versión anterior de Three.js con soporte para WebGL 1.
+
+Prueba:
+1. Sustituye ar.html.
+2. Copia webgl.html.
+3. Inicia el servidor.
+4. Abre http://localhost:8000/webgl.html
+5. Después abre http://localhost:8000/ar.html
+
+Si webgl.html dice:
+- WebGL2 NO, WebGL1 SI: esta V3 debería ser mucho más compatible.
+- WebGL2 NO, WebGL1 NO: el problema es navegador/GPU/aceleración por hardware, no MindAR.

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diagnóstico — Oráculo AR</title>
+<style>
+body{font-family:system-ui,Segoe UI,sans-serif;background:#111;color:#eee;margin:0;padding:24px}
+main{max-width:780px;margin:auto}
+.card{background:#1b1b1b;border:1px solid #555;padding:18px;margin:14px 0}
+button{padding:12px 18px;font-weight:700;cursor:pointer}
+pre{white-space:pre-wrap;background:#050505;padding:12px;border:1px solid #333}
+video{width:100%;max-height:420px;background:#000;margin-top:14px}
+.ok{color:#7ee787}.bad{color:#ff7b72}.warn{color:#d29922}
+</style>
+</head>
+<body>
+<main>
+<h1>Diagnóstico del Oráculo AR</h1>
+<p>Esta página prueba por separado cámara, marcador y librerías externas.</p>
+
+<div class="card">
+  <h2>1. Estado básico</h2>
+  <pre id="estado"></pre>
+</div>
+
+<div class="card">
+  <h2>2. Archivo targets.mind</h2>
+  <button id="checkTarget">Comprobar marcador</button>
+  <pre id="targetResult">Sin comprobar.</pre>
+</div>
+
+<div class="card">
+  <h2>3. Cámara</h2>
+  <button id="camBtn">Probar webcam</button>
+  <pre id="camResult">Sin probar.</pre>
+  <video id="video" autoplay playsinline muted></video>
+</div>
+
+<div class="card">
+  <h2>4. Librerías MindAR</h2>
+  <button id="libsBtn">Probar acceso a CDN</button>
+  <pre id="libsResult">Sin probar.</pre>
+</div>
+</main>
+
+<script>
+const estado = document.querySelector("#estado");
+estado.textContent =
+  "URL: " + location.href + "\n" +
+  "Contexto seguro: " + window.isSecureContext + "\n" +
+  "mediaDevices: " + (!!navigator.mediaDevices) + "\n" +
+  "getUserMedia: " + (!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) + "\n" +
+  "Navegador: " + navigator.userAgent;
+
+document.querySelector("#checkTarget").onclick = async () => {
+  const el = document.querySelector("#targetResult");
+  el.textContent = "Comprobando…";
+  try{
+    const r = await fetch("targets/targets.mind", {cache:"no-store"});
+    const b = await r.arrayBuffer();
+    el.textContent = "HTTP " + r.status + "\nTamaño: " + b.byteLength + " bytes\n" +
+      (r.ok && b.byteLength > 1000 ? "OK: el marcador es accesible." : "PROBLEMA: respuesta inesperada.");
+  }catch(e){
+    el.textContent = "ERROR: " + e.message;
+  }
+};
+
+let stream;
+document.querySelector("#camBtn").onclick = async () => {
+  const el = document.querySelector("#camResult");
+  el.textContent = "Solicitando permiso…";
+  try{
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    stream = await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    document.querySelector("#video").srcObject = stream;
+    const track = stream.getVideoTracks()[0];
+    el.textContent = "OK: cámara abierta.\nDispositivo: " + track.label + "\n" +
+      "Estado: " + track.readyState;
+  }catch(e){
+    el.textContent = "ERROR: " + e.name + " — " + e.message;
+  }
+};
+
+document.querySelector("#libsBtn").onclick = async () => {
+  const el = document.querySelector("#libsResult");
+  const urls = [
+    "https://aframe.io/releases/1.6.0/aframe.min.js",
+    "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"
+  ];
+  el.textContent = "Comprobando…";
+  const lines=[];
+  for(const u of urls){
+    try{
+      const r=await fetch(u,{method:"GET",cache:"no-store"});
+      lines.push((r.ok?"OK ":"FALLO ") + r.status + " — " + u);
+    }catch(e){
+      lines.push("ERROR — " + u + "\n" + e.message);
+    }
+  }
+  el.textContent=lines.join("\n\n");
+};
+</script>
+</body>
+</html>

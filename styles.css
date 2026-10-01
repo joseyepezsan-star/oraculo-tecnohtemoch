@@ -28,3 +28,289 @@ h1{margin:0 0 6px;text-align:center;letter-spacing:.08em;font-size:clamp(2rem,7v
 .prediccion .giro{font-style:italic}
 .prediccion .consejo{font-weight:700;border-top:1px solid rgba(40,20,8,.35);padding-top:12px}
 .smallcaps{font-variant:small-caps;letter-spacing:.08em}
+
+/* Página informativa: inteligencia emocional */
+.content-shell{align-items:flex-start;padding-top:36px;padding-bottom:36px}
+.info-panel{width:min(860px,100%)}
+.eyebrow{text-align:center;color:#c99a58;font-size:.78rem;letter-spacing:.18em;margin:0 0 10px}
+.page-title{font-size:clamp(1.65rem,5.5vw,3rem);line-height:1.08;margin-bottom:24px}
+.lead-card,.myth-card{border:1px solid rgba(181,122,44,.45);background:rgba(38,23,16,.55);padding:20px;margin:20px 0}
+.lead-card p,.myth-card p{line-height:1.6;margin:0 0 12px;color:#e8d9bf}
+.lead-card p:last-child,.myth-card p:last-child{margin-bottom:0}
+.lead{font-size:1.08rem}
+.section-title{text-align:center;color:#f0dfbf;font-size:1.35rem;margin:30px 0 16px}
+.skill-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.skill-card{position:relative;border:1px solid rgba(181,122,44,.35);background:rgba(8,7,6,.55);padding:19px 18px 18px;min-height:170px}
+.skill-card.wide{grid-column:1/-1;min-height:auto}
+.skill-card h3{margin:5px 0 9px;color:#e5b66f;font-size:1.15rem}
+.skill-card p{margin:0;color:#d9c9b1;line-height:1.5}
+.skill-number{font-size:.72rem;letter-spacing:.14em;color:#8f6330}
+.myth-card h2{margin:0 0 10px;color:#d7aa67;font-size:1.2rem}
+.closing-quote{margin:28px 0 14px;padding:18px 22px;border-top:1px solid #74491f;border-bottom:1px solid #74491f;text-align:center;color:#f1dfbd}
+.closing-quote p{display:inline;margin:0;font-size:clamp(1.1rem,3.5vw,1.35rem);font-style:italic;line-height:1.5}
+.closing-quote span{color:#b57a2c;font-size:1.8rem;vertical-align:middle}
+.oracle-note{text-align:center;color:#ae9370;font-style:italic;font-size:.92rem;line-height:1.5;margin:18px auto 26px;max-width:650px}
+.page-actions{margin-top:12px}
+.button.tertiary{background:#17100c;color:#dfc398;border-color:#76512b;text-transform:none;letter-spacing:.03em}
+.button.tertiary:hover{background:#241711}
+@media (max-width:640px){
+  .content-shell{padding:14px}
+  .info-panel{padding:22px 18px}
+  .skill-grid{grid-template-columns:1fr}
+  .skill-card.wide{grid-column:auto}
+  .lead-card,.myth-card{padding:16px}
+}
+
+
+/* ===============================
+   FASE 4 · CRÉDITOS DEL PROYECTO
+   =============================== */
+
+.credits-panel{
+  width:min(980px,100%);
+}
+
+.credits-header{
+  text-align:center;
+}
+
+.school-logo{
+  display:block;
+  width:auto;
+  max-width:min(320px,78vw);
+  height:auto;
+  margin:0 auto 22px;
+  image-rendering:auto;
+}
+
+.credits-title{
+  margin-bottom:6px;
+}
+
+.credits-subtitle{
+  margin:0;
+  color:#e6bd7b;
+  font-size:clamp(1.2rem,4vw,1.8rem);
+  text-align:center;
+  font-weight:700;
+}
+
+.credits-kicker{
+  margin:7px 0 25px;
+  text-align:center;
+  color:#aa9170;
+  font-size:.92rem;
+  letter-spacing:.04em;
+}
+
+.hero-credits{
+  margin:22px 0 0;
+  border:1px solid rgba(181,122,44,.45);
+  background:#0d0907;
+  padding:8px;
+}
+
+.hero-credits img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+.hero-credits figcaption{
+  color:#9f8c74;
+  font-size:.82rem;
+  line-height:1.45;
+  padding:10px 8px 4px;
+  text-align:center;
+  font-style:italic;
+}
+
+.credits-meta{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:18px 0 30px;
+}
+
+.credits-meta>div{
+  border:1px solid rgba(181,122,44,.35);
+  background:rgba(38,23,16,.45);
+  padding:14px;
+  text-align:center;
+}
+
+.meta-label{
+  display:block;
+  color:#9f835f;
+  font-size:.68rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+
+.credits-meta strong{
+  color:#eddab9;
+  font-size:.98rem;
+}
+
+.credits-section{
+  border-top:1px solid rgba(181,122,44,.35);
+  padding-top:20px;
+  margin-top:8px;
+}
+
+.section-tag{
+  text-align:center;
+  color:#9f835f;
+  font-size:.68rem;
+  letter-spacing:.16em;
+  margin:0 0 7px;
+  text-transform:uppercase;
+}
+
+.left-title{
+  text-align:left;
+  margin-top:0;
+}
+
+.student-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 28px;
+  margin:10px 0 0;
+  padding:0;
+  list-style:none;
+  counter-reset:students;
+}
+
+.student-list li{
+  counter-increment:students;
+  position:relative;
+  padding:10px 10px 10px 42px;
+  border-bottom:1px solid rgba(181,122,44,.2);
+  color:#e2d2ba;
+  line-height:1.35;
+  text-transform:none;
+}
+
+.student-list li::before{
+  content:counter(students, decimal-leading-zero);
+  position:absolute;
+  left:8px;
+  top:10px;
+  color:#b57a2c;
+  font-size:.73rem;
+  letter-spacing:.05em;
+}
+
+.credits-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin:30px 0;
+}
+
+.credit-card{
+  border:1px solid rgba(181,122,44,.42);
+  background:rgba(38,23,16,.5);
+  padding:22px;
+}
+
+.credit-card.ai-card{
+  background:rgba(14,23,30,.72);
+  border-color:rgba(91,118,142,.55);
+}
+
+.credit-card h2{
+  margin:4px 0 12px;
+  color:#e2b36d;
+  font-size:1.25rem;
+}
+
+.credit-card p{
+  color:#dfcfb8;
+  line-height:1.62;
+  margin:0 0 12px;
+}
+
+.credit-card p:last-child{
+  margin-bottom:0;
+}
+
+.card-icon{
+  color:#b57a2c;
+  font-size:1.35rem;
+}
+
+.teacher-note{
+  margin:32px 0 20px;
+  padding:26px 22px;
+  border-top:1px solid #74491f;
+  border-bottom:1px solid #74491f;
+  background:linear-gradient(180deg,rgba(107,29,29,.13),rgba(9,8,7,.08));
+}
+
+.teacher-note .section-title{
+  margin:6px 0 22px;
+}
+
+.poem{
+  max-width:680px;
+  margin:0 auto;
+  color:#ecdcc2;
+  text-align:center;
+}
+
+.poem p{
+  line-height:1.7;
+  margin:0 0 17px;
+}
+
+.teacher-sign{
+  text-align:right;
+  color:#c69a5a;
+  font-style:italic;
+  margin:12px auto 0;
+  max-width:680px;
+}
+
+.credits-footer-note{
+  max-width:700px;
+  margin:20px auto 24px;
+  text-align:center;
+  color:#b49a77;
+  line-height:1.5;
+  font-size:.9rem;
+}
+
+.page-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:26px;
+}
+
+@media (max-width:720px){
+  .credits-meta,
+  .credits-grid,
+  .student-list,
+  .page-actions{
+    grid-template-columns:1fr;
+  }
+
+  .credits-meta{
+    gap:8px;
+  }
+
+  .student-list{
+    gap:0;
+  }
+
+  .teacher-note{
+    padding:22px 15px;
+  }
+
+  .school-logo{
+    max-width:min(250px,76vw);
+  }
+}
