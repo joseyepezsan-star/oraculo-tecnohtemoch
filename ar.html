@@ -59,10 +59,6 @@ button{
   padding:14px 18px;font:700 16px Georgia,serif;cursor:pointer;
   width:100%;margin-top:12px;
 }
-#technical{
-  font:12px/1.45 Consolas,monospace;color:#d1b991;background:#090705;
-  padding:10px;margin-top:14px;text-align:left;white-space:pre-wrap;
-}
 
 /* Carta HTML superpuesta: más compatible que una textura canvas sobre WebGL */
 #predictionOverlay{
@@ -134,7 +130,6 @@ button{
       <h2>Consulta con cámara</h2>
       <p>Activa la cámara y apunta al mural completo de Tecnohtemoch.</p>
       <button id="startBtn" disabled>ACTIVAR CÁMARA</button>
-      <div id="technical">Esperando carga…</div>
     </div>
   </div>
 
@@ -176,8 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const hint = document.querySelector("#hint");
   const startPanel = document.querySelector("#startPanel");
   const startBtn = document.querySelector("#startBtn");
-  const technical = document.querySelector("#technical");
-
   const overlay = document.querySelector("#predictionOverlay");
   const predTitle = document.querySelector("#predTitle");
   const predSerio = document.querySelector("#predSerio");
@@ -190,11 +183,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let targetVisible = false;
 
   const log = (m) => {
-    technical.textContent += "\n" + m;
     console.log("[ORACULO]", m);
   };
 
-  technical.textContent = "";
   log("A-Frame: " + (window.AFRAME ? AFRAME.version : "NO CARGÓ"));
   log("MindAR component: " + (!!(window.AFRAME && AFRAME.components && AFRAME.components["mindar-image"])));
   log("Modo de carta: HTML superpuesto (compatibilidad alta)");
